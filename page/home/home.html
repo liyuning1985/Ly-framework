@@ -1,0 +1,118 @@
+<style type="text/css">
+	.state_success{
+		color: green;
+	}
+</style>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<h2>工作日志 11月</h2>
+			<hr>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-28----2016-12-02</h3>
+			<p>1.运维助手交接工作。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-25</h3>
+			<p>1.page目录下所有配置文件（*.json）文件，已经移出page静态目录。相关代码路径的修改工作正在进行。（80%）</p>
+			<p>2.自用更新配置文件的接口/updateHelperDb接口已经取消，改功能代码已经改为在启动app.js时，自执行一次用来更新helper.json文件的内容。（已完成）。</p>
+			<p>3.已经替换了cas模块中的相关文件，现在可以正确提取到sso配置的userid，可以进行，后台日志记录中关于userid的添加。（未开始）</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-24</h3>
+			<p>1.完成升级接口的代码编写工作。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-22</h3>
+			<p>1.完成所有post接口的安全加固代码修改。</p>
+			<p>2.明天启动升级时，需要升级的2个接口，以及配置文件目录更换的问题。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-21</h3>
+			<p>1.完成接口/runScript以及/SaveServerMailconfig接口的安全效验。</p>
+			<p>2.按照文件已经完成cmd.js、config.js文件的安全校验</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-19</h3>
+			<p>1.客户要求加班一天。</p>
+			<p>2.cmd接口的验证已经完成。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-18</h3>
+			<p>1.已经启动开始，rest接口的修改工作。一共40个接口，全部进行效验。</p>
+			<p>2.rest接口review完成10%。</p>
+			<p>3.完成验证规则函数的编写。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-17</h3>
+			<p>1.整理所有restAPI接口的安全校验工作，整理了一套文档。晚上7点评审，发现要求与自查标准差距极大，鉴于此情况，需要全面重新review所有rest接口代码</p>
+			<p>另附接口文档的下载地址<a href="../download/rest_api_report.xlsx">rest_Api文档</a></p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-16</h3>
+			<p>1.调试通SSO配置，搞清楚SSO配置原理。</p>
+			<p>2.研究在配置SSO时的退出问题。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-15</h3>
+			<p>1.修改问题单【公有云解决方案测试】【DT 】【运维助手】【安全测试】运维助手rest接口存在命令注入风险，<span class="text-info">已经修改完成。并提交。</span> </p>
+			<p>2.完成report.json的所有数据展示。明天即可进入修改阶段。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-14</h3>
+			<p>1.排查所有可执行脚本的接口的函数是否存在安全注入问题，代码已经修改，并在159上验证通过。。</p>
+			<p>2.排查出，OpsMonitor接口跳转函数被移除，需要重新加入，并修改其解密方式。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-11</h3>
+			<p>1.保存邮件服务器配置api修改成在后台加引号，进行加密，前台不在传入引号。<span class="text-success">代码已经完成，并合入。</span></p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-10</h3>
+			<p>1.DTS2016092800935【公有云解决方案测试】【DT 】【运维助手】【安全渗透】【拒绝服务】运维助手18080端口无认证，可以远端攻击18080... 问题单已走给段睿处理。</p>
+			<p>2.DTS2016102820313 【DT类生产】【OPS Assistant工具】页面 无退出按钮，退出时只能强行关闭网页；建议设置退出按钮。研究elk sso登录退出机制。确认了如果配置SSO，退出时应跳转到SSO登录页面</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-09</h3>
+			<p>1.协助定位CTC测试OpsAssisstant,入口配置不了的问题。经定位发现1.8.0的版本，配置了1.5.0的配置文件，造成程序报错。<span class="text-success">已经解决</span></p>
+			<p>2.确认了1.9.0版本api接口/SendtestMail后台没有做参数验证，1.9.1版本才加入了参数验证。</p>
+			<p class="text-danger">3.备忘：和德卓对过，新特性report.json，UI配置化功能，暂时不提供中英切换，默认为英文。</p>
+			<p>3.再次排查1.9.0版本的api接口,执行加解密脚本时的参数没有进行校验，但是只有保存邮件服务的接口，在后台加解密时，没有加入引号处理，其他的接口，加解密脚本执行，均在后台参数两边加入了引号处理。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-08</h3>
+			<p>今日请年假一天</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-07</h3>
+			<p>1.新特性开发50%。遇到问题，fsp数据结构过于复杂，正在设计该系统的UI配置</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-04</h3>
+			<p>1.问题单基本能走的都走了。</p>
+			<p>2.新特性开发40%</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-03</h3>
+			<p>1.问题单DTS2016102900415，【DT类生产】【OPS Assistant】主页OPS Assistant和运维助手中间的箭头建议做明显功能提示。<span class="state_success">已经完成并走单</span></p>
+			<p>2.开始新特性report.json的开发.30%</p>
+			<p>3. DTS2016102900377 【DT类生产】【OPS Assistant】点击 两个按钮都会跳出收藏夹页面 <span class="state_success">修改完成，已走单</span></p>
+			<p>4.DTS2016102900273 【DT类生产】【OPS Assistant】 建议为此工具页面加上华为Logo <span class="state_success">修改完成，已走单</span></p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-02</h3>
+			<p>1.计划开始完成问题单DTS2016102903966,【DT类生产】【OPS Assitant】 关联查询人工查找复杂，请设置有效的检索。<span class="state_success">已经完成</span></p>
+			<p>2.日志模块初始化，加入数据库判空处理。</p>
+			<p>3.修复关联查询中，fsp_hosts别名为空时，表格显示错乱的bug。</p>
+			<p>4.UI问题单已经暂时走给姜暄进行方案处理。</p>
+			<p>5.修复问题单关于安全的跳转问题单file模块那里。</p>
+		</div>
+		<div class="col-md-12">
+			<h3>2016-11-01</h3>
+			<p>1.问题单DTS2016102901605（运维助手操作日志）执行时间换算为秒。<span class="state_success">本地修改完成。<span></p>
+			<p>2.问题单DTS2016102901427，报表生成状态英文表述合理化。<span class="state_success">本地修改完成，已走单。</span></p>
+			<p>3.与姜暄对齐UI效果内容。</p>
+		</div>
+	</div>
+</div>
