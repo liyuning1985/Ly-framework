@@ -6,7 +6,7 @@ require.config({
         "bootstrap": "lib/Bootstrap3.35/js/bootstrap.min",
         "layer": "lib/Bootstrap3.35/js/plugins/layer/layer",
         "ui-router": "lib/angular-ui-router",
-        "jquery": "lib/jquery",
+        "jquery": "lib/jquery-1.11.1.min",
         "angular": "lib/angular",
         "routerConfig": "framework/routerConfig",
         "metisMenu": "lib/Bootstrap3.35/js/plugins/metisMenu/jquery.metisMenu",
