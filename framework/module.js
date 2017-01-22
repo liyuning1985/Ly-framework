@@ -1,7 +1,7 @@
 define(function (require) {
     "use strict";
     var mod = [
-        require("page/portal/config"),
+        require("portal/config"),
         require("business/System/configures/SystemConfig")
     ]
     for (var i in mod) {
