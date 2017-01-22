@@ -8,8 +8,6 @@ define([
             title: ""
 
         }
-        console.info($scope);
-
         $scope.$watch("root", function (newvalue, oldvalue) {
             var CacheList = $rootScope.Cache.List;
             console.info($rootScope.TopTabs.TabSelected);

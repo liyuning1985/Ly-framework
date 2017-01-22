@@ -2,8 +2,8 @@ define([
     "framework/routerConfig",
     "framework/common"
 ], function (mod, Ly) {
-    var Ctrl = ["$scope", "$urlRouter", "$rootScope", "$state"];
-    var CtrlFn = function ($scope, $urlRouter, $rootScope, $state) {
+    var Ctrl = ["$scope", "$urlRouter", "$rootScope", "$state","$location"];
+    var CtrlFn = function ($scope, $urlRouter, $rootScope, $state, $location) {
         var menu = mod.getMenu("main");
         $scope.menuList = menu;
 
@@ -34,6 +34,40 @@ define([
                     $rootScope.TopTabs.TabSelected = tabs[tabs.length - 1].id;
                     $state.go(tabs[tabs.length - 1].state);
                 }
+            },
+            closeotherTab: function () {
+                //关闭其他tabs
+                var activeTabId = $rootScope.TopTabs.TabSelected;
+                var tabs = $rootScope.TopTabs.data;
+                if (tabs.length == 1) {
+                    return;
+                }
+                var cache = Ly.findObj("id", activeTabId, $rootScope.Cache.List);
+                var indexcache = Ly.findObj("id", 0, $rootScope.Cache.List);
+                var newList = [];
+                newList.push(indexcache);
+                newList.push(cache);
+                $rootScope.Cache.List = newList;
+                var activeTab = Ly.findObj("id", activeTabId, tabs);
+                var indexTab = Ly.findObj("id", 0, tabs);
+                var newTabs = [];
+                newTabs.push(indexTab);
+                newTabs.push(activeTab);
+                $rootScope.TopTabs.data = newTabs;
+            },
+            closeAllTab: function () {
+                //关闭所有的tabs 回到首页
+                var tabs = $rootScope.TopTabs.data;
+                var indexcache = Ly.findObj("id", 0, $rootScope.Cache.List);
+                var newList = [];
+                newList.push(indexcache);
+                var indexTab = Ly.findObj("id", 0, tabs);
+                var newTabs = [];
+                newTabs.push(indexTab);
+                $rootScope.Cache.List = newList;
+                $rootScope.TopTabs.data = newTabs;
+                $rootScope.TopTabs.TabSelected = 0;
+                $state.go("home");
             }
         };
 
@@ -67,6 +101,11 @@ define([
                     $state.go(menu.state);
                 }
             }
+        }
+
+        var tabsCount = $rootScope.TopTabs.data.length;
+        if (tabsCount == 1) {
+           location.href = "#/home";
         }
         $urlRouter.sync();
     };
