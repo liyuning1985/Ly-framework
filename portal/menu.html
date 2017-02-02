@@ -1,3 +1,8 @@
+<style>
+     hr {
+        border-color: #d8d8d8;
+    }
+</style>
 <div id="wrapper">
     <nav class="navbar-default navbar-static-side" role="navigation">
         <div class="nav-close">
@@ -51,7 +56,16 @@
                     </a>
                     <ul class="nav nav-second-level collapse" ng-if="menu.children.length != 0">
                         <li ng-repeat="child in menu.children">
-                            <a class="J_menuItem" href="javascript:void(0)" ng-bind="child.text" ng-click="LeftMemu.SelectMenu(child)"></a>
+                            <a ng-if="child.state" class="J_menuItem" href="javascript:void(0)" ng-bind="child.text" ng-click="LeftMemu.SelectMenu(child)"></a>
+                            <a href="javascript:void(0)" ng-if="!child.state">
+                                <span class="nav-label" ng-bind="child.text"></span>
+                                <span class="fa arrow" ng-show="child.children.length != 0"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse" ng-if="child.children.length !=0">
+                                <li ng-repeat="son in child.children">
+                                    <a class="J_menuItem" href="javascript:void(0)" ng-bind="son.text" ng-click="LeftMemu.SelectMenu(child)"></a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </li>

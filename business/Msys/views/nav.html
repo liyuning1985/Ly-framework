@@ -1,0 +1,53 @@
+<style type="text/css">
+    .state_success {
+        color: green;
+    }
+
+    .ly-nav {
+        background-color: #2f4050;
+    }
+
+        .ly-nav nav span {
+            color: #a7b1c2;
+        }
+
+    .Ly-nav-a :hover {
+        color: #fff;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 ly-nav">
+            <nav>
+                <div>
+                    <a ng-show="m.isShow" class="navbar-brand Ly-nav-a" href="javascript:void(0)" ng-repeat="m in root.activeMenu" ng-click="root.activeId =m.id;root.Selectactive(m)">
+                        <span ng-bind="m.text"></span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div ng-if="(root.activeId !='0')" class="row" style="margin-bottom:15px;">
+        <div class="col-md-12" style="padding:0px;">
+            <ol class="breadcrumb" style="padding:15px;">
+                <li><a href="javascript:void(0)" ng-click="root.activeId = '0'">主界面</a></li>
+                <li ng-repeat="level in root.Road">
+                    <a href="javascript:void(0)" ng-click="root.activeId = level.id" ng-bind="level.text"></a>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div ng-if="(root.activeId=='0')">
+        <div ui-view="index"></div>
+    </div>
+    <div ng-if="(root.activeId=='1')">
+        <div ui-view="guestlogin"></div>
+    </div>
+    <div ng-if="(root.activeId=='2')">
+        <div ui-view="product"></div>
+    </div>
+    <div ng-if="(root.activeId=='3')">
+        <div ui-view="project"></div>
+    </div>
+</div>
+

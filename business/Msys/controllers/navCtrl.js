@@ -1,43 +1,36 @@
 define([
-    "framework/common"
-], function (Ly) {
-    var Ctrl = ["$rootScope","$scope"];
-    var Fn = function ($rootScope,$scope) {
+     "framework/common",
+     "framework/routerConfig"
+], function (Ly, router) {
+    var Ctrl = ["$rootScope", "$scope"];
+    var Fn = function ($rootScope, $scope) {
         var id = $rootScope.TopTabs.TabSelected;
+        var initMenus = [
+            { id: '1', text: "会员登录", isShow: true },
+            { id: '2', text: "药妆销售", isShow: false },
+            { id: '3', text: "项目销售", isShow: false }
+        ]
+
+
+
         $scope.root = {
-            title: ""
-
-        }
-        $('#jstree1').jstree({
-            'core': {
-                'check_callback': true
+            activeMenu: initMenus,
+            activeId: '0',
+            Selectactive: function (m) {
+                $scope.root.Road = [];
+                var item = {};
+                item.id = m.id;
+                item.text = m.text;
+                $scope.root.Road.push(item);
+                console.info($scope.root.Road);
             },
-            'plugins': ['types', 'dnd'],
-            'types': {
-                'default': {
-                    'icon': 'fa fa-folder'
-                },
-                'html': {
-                    'icon': 'fa fa-file-code-o'
-                },
-                'svg': {
-                    'icon': 'fa fa-file-picture-o'
-                },
-                'css': {
-                    'icon': 'fa fa-file-code-o'
-                },
-                'img': {
-                    'icon': 'fa fa-file-image-o'
-                },
-                'js': {
-                    'icon': 'fa fa-file-text-o'
-                }
+            Road: []
+        }
+        //console.info($scope);
 
-            }
-        });
         $scope.$watch("root", function (newvalue, oldvalue) {
+            if (!newvalue) return;
             var CacheList = $rootScope.Cache.List;
-            console.info($rootScope.TopTabs.TabSelected);
             var scope = {}
             var id = $rootScope.TopTabs.TabSelected;
             scope.id = id;
@@ -63,4 +56,5 @@ define([
     };
     Ctrl.push(Fn);
     return Ctrl;
+
 });

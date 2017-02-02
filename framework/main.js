@@ -1,7 +1,7 @@
 "use strict";
 
 require.config({
-    "baseUrl": "./",
+    "baseUrl": "../",
     "paths": {
         "bootstrap": "lib/Bootstrap3.35/js/bootstrap.min",
         "layer": "lib/Bootstrap3.35/js/plugins/layer/layer",
@@ -11,7 +11,8 @@ require.config({
         "routerConfig": "framework/routerConfig",
         "metisMenu": "lib/Bootstrap3.35/js/plugins/metisMenu/jquery.metisMenu",
         "slimscroll": "lib/Bootstrap3.35/js/plugins/slimscroll/jquery.slimscroll.min",
-        "hplus": "lib/hplus.min"
+        "hplus": "lib/hplus.min",
+        "jstree": "lib/Bootstrap3.35/js/plugins/jsTree/jsTree.min"
     },
     "shim": {
         'cookie': {
@@ -39,6 +40,9 @@ require.config({
         'angular': {
             deps: ['jquery'],
             exports: 'angular'
+        },
+        'jstree': {
+            deps: ['jquery']
         }
     },
     waitSeconds: 120,
@@ -47,5 +51,5 @@ require.config({
 
 require(["framework/framework", "jquery"], function (app, $) {
     var injector = angular.bootstrap($("html"), [app.name]);
-    require(['bootstrap', 'layer', 'metisMenu', 'slimscroll', 'hplus']);
+    require(['bootstrap', 'layer', 'metisMenu', 'slimscroll', 'hplus', 'jstree']);
 });
