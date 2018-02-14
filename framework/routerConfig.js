@@ -1,8 +1,18 @@
-define(["ui-router"],
-    function () {
+define(["language/keyID",
+    "sprintf",
+    "app/portal/home/homeService",
+    "app/services/tipMessageService",
+    "ui-router/angular-ui-router.min"
+],
+    function (i18n, sprintf, homeService, tipMessageService) {
         "use strict";
-
         var mod = angular.module("ui.router");
+        var tipMessage = new tipMessageService();
+        var paramsRegion = {
+            "ci": "Region",
+            "action": "Query"
+        };
+
         function getResolve($controllerProvider, ctrlPath, ctrlName) {
             return {
                 ctrl: function ($q) {
@@ -17,26 +27,28 @@ define(["ui-router"],
             };
         }
 
-        var newGuid = function () {
-            var guid = "";
-            for (var i = 1; i <= 32; i++) {
-                var n = Math.floor(Math.random() * 16.0).toString(16);
-                guid += n;
-                if ((i == 8) || (i == 12) || (i == 16) || (i == 20))
-                    guid += "-";
+        i18n.sprintf = sprintf.sprintf;
+        i18n.split = function (key) {
+            try {
+                return key.split(/\r\n|\n|\<\s*\w+\s*\/\>/g);
+            } catch (e) {
             }
-            return guid + "";
-        }
+            return [];
+        };
+
+        mod.i18n = i18n;
 
         mod._menuData = {};
         mod._authMap = {};
         mod._authKey = {};
-        mod._stateReplaceMap = {};
-        mod._stateLevelMap = {};
 
         mod.authMap = function (map) {
             mod._authMap = map;
-        }
+        };
+
+        mod.updateAuthMap = function (map) {
+            mod._authMap = $.extend(mod._authMap, map);
+        };
 
         mod.stateAllow = function (state) {
             //conditions 为一个数组 个数组之间是逻辑去与，每一项是string或数组，如是数据，关系是逻辑取或
@@ -56,15 +68,17 @@ define(["ui-router"],
             var conditions = mod._authKey[state] || [];
             var result = true;
             if (conditions.length) {
+                //与
                 for (var i = 0, len = conditions.length; i < len; i++) {
                     var item = conditions[i];
                     var type = typeof item;
                     var innerResult = false;
                     if ("string" == type) {
-                        innerResult = mod._authMap[item];
+                        innerResult = calNotLogic(item);
                     } else if ("object" == type) {
+                        //或
                         for (var j = 0, innerLen = item.length; j < innerLen; j++) {
-                            innerResult = (innerResult || mod._authMap[item[j]]);
+                            innerResult = (innerResult || calNotLogic(item[j]));
                         }
                     }
                     result = result && innerResult;
@@ -73,7 +87,16 @@ define(["ui-router"],
             return result;
         }
 
-        mod.run(function ($rootScope, $state) {
+        function calNotLogic(key) {
+            //非
+            var isNot = key && key.indexOf("!") === 0;
+            return isNot ? (!mod._authMap[key.substr(1)]) : mod._authMap[key];
+        }
+
+        var times;
+
+        mod.run(function ($rootScope, $state, $urlService, $q) {
+            $rootScope.i18n = i18n;
             $rootScope.$on('$stateChangeSuccess',
                 function (event, toState, toParams, fromState, fromParams) {
                     if (false && isInvalid(toState.name)) {
@@ -81,6 +104,43 @@ define(["ui-router"],
                         $state.transitionTo(mod.homeState);
                     }
                 });
+            
+            $urlService.rules.otherwise(function(matchValue, urlParts, router) {
+                var notPath = urlParts.path;
+                var arr = notPath.split("/");
+                arr.shift();
+                var notState = arr.join(".");
+                var defer1 = $q.defer();
+                var promise = defer1.promise;
+                var stateName = notState;
+                var stateModul = arr[0];
+
+                if(stateModul) {
+                    var stateConfigUrl = stateModul + "/configures/" + stateModul + "Config";
+                    require([stateConfigUrl], function(ctrl){
+                        if($state.get(stateName)) {
+                            if(times !== stateModul){
+                                ctrl();
+                                times = stateModul;
+                            }                        
+                            defer1.resolve(stateName)
+                        } else {
+                            defer1.reject();
+                        }
+                    }, function(err){
+                        defer1.reject();
+                    })
+                }
+
+                promise.then(function(state){
+                    $state.go(state);
+                }, function(err){
+                    $state.go("home")
+                })
+
+                return promise;
+            })
+            $urlService.rules.when("", "/home");
         });
 
         mod.home = function (state) {
@@ -90,7 +150,7 @@ define(["ui-router"],
                 $urlRouterProvider.otherwise(url);
                 $urlRouterProvider.when("", url);
             });
-        }
+        };
 
         mod.when = function (toState, finalState) {
             mod.config(function ($urlRouterProvider) {
@@ -98,10 +158,10 @@ define(["ui-router"],
                 var finalUrl = "/" + finalState.replace(/\./gi, "/");
                 $urlRouterProvider.when(toUrl, finalUrl);
             });
-        }
+        };
 
-        mod.state = function (state, template, ctrlPath, para, force) {
-            mod.config(function ($stateProvider, $controllerProvider) {
+        mod.state = function (state, template, ctrlPath, para) {
+            var configRouter = function ($stateProvider, $controllerProvider) {
                 var url = "/" + state;
                 var arr = state.split(".");
                 if (arr && arr.length && arr.length > 0) {
@@ -118,36 +178,7 @@ define(["ui-router"],
                     url: url
                 };
                 if (template) {
-                    if (typeof template == "object") {
-                        var views = {};
-                        var parentStates = angular.copy(arr);
-                        parentStates.splice(arr.length - 1, 1);
-                        for (var p in template) {
-                            var item = template[p];
-                            var name = (parentStates.concat([p, "ctrl"])).join(".");
-                            views[p] = {
-                                templateUrl: item.templateUrl,
-                                controller: name,
-                                resolve: getResolve($controllerProvider, item.controllerPath, name)
-                            };
-                        }
-                        $stateProvider.state(state, {
-                            url: url,
-                            views: views
-                        });
-                        return;
-                    } else if (typeof template == "string") {
-                        if ("#" == template.charAt(0)) {
-                            config.template = "<fm-frame src='" + template.substr(1) + "' mask='mask' />";
-                        }
-                        else if ("<" == template.charAt(0)) {
-                            config.template = template;
-                        }
-                        else {
-                            config.templateUrl = template;
-                        }
-                    }
-
+                    config.templateUrl = template;
                 } else {
                     config.template = "<div ui-view></div>";
                 }
@@ -155,65 +186,74 @@ define(["ui-router"],
                 if (ctrlPath) {
                     if ("function" == typeof ctrlPath) {
                         config.controller = ctrlPath;
-                    }
-                    else if ("string" == typeof ctrlPath) {
+                    } else if ("string" == typeof ctrlPath) {
                         config.controller = ctrlName;
                         config.resolve = getResolve($controllerProvider, ctrlPath, ctrlName);
                     }
-                    else if ("object" == typeof ctrlPath) {
-                        config.controller = function ($scope) {
-                            for (var i in ctrlPath) {
-                                $scope[i] = ctrlPath[i];
-                            }
-                        }
-                    }
-                }
-
-                if (force) {
-                    mod._stateReplaceMap[state] = config;
-
-                    $stateProvider.decorator('views', function (s, parent) {
-                        var result = {}, views = parent(s);
-
-                        var r = mod._stateReplaceMap[s.name];
-                        if (null == r) {
-                            return views;
-                        }
-
-                        angular.forEach(views, function (cfg, name) {
-                            if (r.template) {
-                                cfg.template = r.template;
-                            }
-                            if (r.templateUrl) {
-                                cfg.templateUrl = r.templateUrl;
-                            }
-                            if (r.controller) {
-                                cfg.controller = r.controller;
-                            }
-                            if (r.resolve) {
-                                cfg.resolve = r.resolve;
-                            }
-                            result[name] = cfg;
-                            return result;
-                        });
-
-                        return views;
-                    });
-                } else {
                     $stateProvider.state(state, config);
                 }
-            });
+                else {
+                    if (typeof template === "object") {
+                        var views = {};
+                        var parentStates = angular.copy(arr);
+                        parentStates.splice(arr.length - 1, 1);
+                        var ctrlNames = [];
+                        var ctrlPaths = [];
+                        for (var p in template) {
+                            var item = template[p];
+                            var name = (parentStates.concat([p, "ctrl"])).join(".");
+                            views[p] = {
+                                templateUrl: item.templateUrl,
+                                controller: name
+                            };
+                            ctrlNames.push(name);
+                            ctrlPaths.push(item.controllerPath);
+                        }
+                        $stateProvider.state(state, {
+                            url: url,
+                            views: views,
+                            resolve: {
+                                "ctrl": function($q) {
+                                    var deferred = $q.defer();
+                                    require(ctrlPaths,
+                                        function () {
+                                            var length = ctrlNames.length;
+                                            for(var i=0; i<length; i++) {
+                                                $controllerProvider.register(ctrlNames[i], arguments[i]);
+                                            }
+                                            deferred.resolve();
+                                        });
+                                    return deferred.promise;
+                                }
+                            }
+                        });
+                    } else {
+                        $stateProvider.state(state, config);
+                    }
+                }
+            }
+            
+            var frame; 
+            try {
+                frame = angular.module("framework")
+            } catch (error) {
+                
+            }
+            if(frame && frame.register) {
+                configRouter(frame.register.stateProvider, frame.register.controllerProvider)
+            } else {
+                mod.config(["$stateProvider", "$controllerProvider", configRouter]);
+            }
         };
 
-        mod.menu = function (type, level, state, text, next, icon) {
+        mod.menu = function (type, level, state, text) {
             var e = {
-                id: (state == 'home') ? '0' : newGuid(),
+                id: state,
+                label: text,
                 level: level,
                 state: state,
                 text: text,
-                type: state,
-                child: [],
-                icon: icon
+                child: []
             };
 
             var menu = mod._menuData[type];
@@ -221,26 +261,7 @@ define(["ui-router"],
                 menu = [];
                 mod._menuData[type] = menu;
             }
-
-            if (next) {
-                var nextLevel = level.slice(0, -1);
-                nextLevel.push(next);
-                for (var i = 0; i < menu.length; i++) {
-                    var m = menu[i];
-                    if (nextLevel.join() == m.level.join()) {
-                        break;
-                    }
-                }
-
-                menu.splice(i, 0, e);
-            } else {
-                menu.push(e);
-            }
-
-            var map = mod._stateLevelMap[type] || {};
-            map[e.state] = e.level;
-            mod._stateLevelMap[type] = map;
-            return e;
+            menu.push(e);
         };
 
         mod.menuModify = function (type, level, state) {
@@ -255,7 +276,7 @@ define(["ui-router"],
                     m.state = state;
                 }
             }
-        }
+        };
 
         mod.menuDelete = function (type, level) {
             var menu = mod._menuData[type];
@@ -269,7 +290,7 @@ define(["ui-router"],
                     menu.splice(i, 1);
                 }
             }
-        }
+        };
 
         mod.getMenu = function (type) {
             var menu = angular.copy(mod._menuData[type]);
@@ -293,17 +314,14 @@ define(["ui-router"],
 
                 if (e.level.length > 1) {
                     var supper = index[e.level.slice(0, -1).join()];
-                    if (supper) {
-                        arr = supper.child || [];
-                        e.supper = supper;
-                        supper.invalid = false;
-                    }
+                    arr = supper.child || [];
+                    e.supper = supper;
+                    supper.invalid = false;
                 } else {
                     arr = out.child;
                     e.supper = out;
                 }
 
-                e.children = e.child;
                 arr.push(e);
             }
 
@@ -334,9 +352,7 @@ define(["ui-router"],
             }
 
             trim(out);
-
             return out.child;
         };
-
         return mod;
     });
