@@ -156,7 +156,7 @@ define(["framework/routerConfig"], function (router) {
     }
 
     uiRouter._invokeQueue.splice(i, 1);
-    mod.directive("uiView", function ($state, $compile, $controller, $injector, $anchorScroll, $rootScope) {
+/*    mod.directive("uiView", function ($state, $compile, $controller, $injector, $anchorScroll, $rootScope) {
         var viewIsUpdating = false;
         var $animator = $injector.has('$animator') ? $injector.get('$animator') : false;
 
@@ -301,6 +301,7 @@ define(["framework/routerConfig"], function (router) {
         };
         return config;
     });
+    */
 
 
     mod.directive("fmView", function ($compile, $controller) {
